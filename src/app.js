@@ -83,6 +83,10 @@ app.post('/register', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
+    if (username === "" || password === "") {
+        return res.status(500).json({ error: 'You must provide a username and password' });
+    }
+
     // Insert user into the database
     db.query('INSERT INTO users (username, password, balance) VALUES (?, ?, ?)', [username, password, 10000], (err, results) => {
         if (err) {
