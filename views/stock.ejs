@@ -1,0 +1,27 @@
+<%- include('layout') %>
+
+<%- include('navbar') %>
+
+<div class="container-fluid">
+    <div class="d-flex flex-column flex-lg-row p-2">
+        <div class="flex-grow-1 w-100">
+            <form action="/stock" method="get">
+                <div class="mb-3">
+                    <label for="symbol" class="form-label">Stock Symbol</label>
+                    <input type="text" class="form-control" name="symbol">
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+        <div class="flex-grow-1 w-100">
+            <% if (stock) { %>
+                <p><%= symbol %></p>
+                <p>Current price: <%= stock.c %></p>
+                <p>High price of the day: <%= stock.h %></p>
+                <p>Low price of the day: <%= stock.l %></p>
+                <p>Open price of the day: <%= stock.o %></p>
+                <p>Previous close price: <%= stock.pc %></p>
+            <% } %>
+        </div>
+    </div>
+</div>
