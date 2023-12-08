@@ -1,0 +1,58 @@
+<%- include('layout') %>
+
+<%- include('navbar') %>
+
+<div class="container-fluid">
+    <div class="d-flex flex-column flex-lg-row p-2">
+        <div class="flex-grow-1 w-100">
+            <h5>My Portfolio</h5>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <% portfolio.forEach((stock, index) => { %>
+                    <tr>
+                        <th scope="row"><%= index + 1 %></th>
+                        <td><%= stock.stock_symbol %></td>
+                        <td><%= stock.sum %></td>
+                        <td><a href="/sell?symbol=<%= stock.stock_symbol %>&sum=<%= stock.sum %>">Sell Stock</a></td>
+                    </tr>
+                <% }); %>
+                </tbody>
+            </table>
+        </div>
+        <div class="flex-grow-1 w-100">
+            <h5>My transactions</h5>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Transaction Type</th>
+                    <th scope="col">Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% transactions.forEach((transaction, index) => { %>
+                    <tr>
+                        <th scope="row"><%= index + 1 %></th>
+                        <td><%= transaction.stock_symbol %></td>
+                        <td><%= transaction.quantity %></td>
+                        <td><%= transaction.price %></td>
+                        <td><%= transaction.transaction_type %></td>
+                        <td><%= transaction.transaction_date %></td>
+                    </tr>
+                <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

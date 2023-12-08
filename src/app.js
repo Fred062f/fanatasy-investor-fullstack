@@ -32,16 +32,20 @@ app.use(session({
 // middleware to test if authenticated
 function isAuthenticated(req, res, next) {
     if (req.session.user) next();
-    else res.redirect('/login');
+    else res.redirect('/');
 }
 
-// Set up the Finnhub API key
-// https://finnhub.io/docs/api/quote
+app.use((req, res, next) => {
+    res.locals.user = req.session.user
+    next();
+});
+
+// Set up Finnhub (https://finnhub.io/docs/api/quote)
 const api_key = finnhub.ApiClient.instance.authentications['api_key'];
 api_key.apiKey = process.env.API_KEY;
 const finnhubClient = new finnhub.DefaultApi();
 
-// Setup EJS
+// Set up EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
 
@@ -83,10 +87,6 @@ app.post('/register', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
-    if (username === "" || password === "") {
-        return res.status(500).json({ error: 'You must provide a username and password' });
-    }
-
     // Insert user into the database
     db.query('INSERT INTO users (username, password, balance) VALUES (?, ?, ?)', [username, password, 10000], (err, results) => {
         if (err) {
@@ -124,8 +124,8 @@ app.post('/login', (req, res) => {
                 // Save the session before redirection
                 req.session.save(function (err) {
                     if (err) return next(err);
-                    console.log('User logged in succesfully')
-                    res.render('stock', {symbol: "", stock: ""})
+                    console.log('User logged in successfully')
+                    res.redirect('/home')
                 })
             })
         }
@@ -146,12 +146,208 @@ app.get('/logout', function (req, res, next) {
         // guard against forms of session fixation
         req.session.regenerate(function (err) {
             if (err) next(err)
+            console.log('User logged out successfully')
             res.redirect('/')
         })
     })
 })
 
-// Push
+app.get('/home', isAuthenticated, (req, res) => {
+    // Query to get user's portfolio
+    db.query('SELECT stock_symbol, SUM(quantity) AS sum FROM portfolios WHERE user_id = ? GROUP BY stock_symbol', [req.session.userID], (error, portfolioResults) => {
+        if (error) {
+            console.error(error);
+        }
+        // Query to get users transactions
+        db.query('SELECT stock_symbol, quantity, price, transaction_type, transaction_date FROM portfolios WHERE user_id = ?', [req.session.userID], (err, transactionsResults) => {
+            if (err) {
+                console.error('Error displaying users transactions:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+            res.render('home', { portfolio: portfolioResults, transactions: transactionsResults });
+        })
+    });
+})
+
+app.get('/sell', isAuthenticated, (req, res) => {
+    const stockSymbol = req.query.symbol;
+    const stockSum = req.query.sum;
+
+    res.render('sell', { symbol: stockSymbol, sum: stockSum });
+})
+
+app.post('/sell', isAuthenticated, (req, res) => {
+    // Get parameters
+    const symbol = req.body.stock_symbol;
+    const quantity = req.body.quantity;
+
+    // Check if the user owns enough of the stock
+    db.query('SELECT stock_symbol, SUM(quantity) as totalQuantity FROM portfolios WHERE user_id = ? GROUP BY stock_symbol HAVING stock_symbol = ? AND SUM(quantity) >= ?', [req.session.userID, symbol, quantity], (err, results) => {
+        if (err) {
+            console.error('Error checking if user owns stock:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Check if the user owns enough stock
+        if (results.length > 0) {
+
+            // Fetch current price of the stock
+            finnhubClient.quote(symbol, (err, data, response) => {
+                if (err) {
+                    console.error('Error fetching stock price:', err);
+                    return res.status(500).json({ error: 'Internal Server Error' });
+                }
+
+                const currentPrice = data.c;
+
+                // Total price to deposit back to users account
+                const totalPrice = parseFloat(quantity) * parseFloat(currentPrice);
+
+                // Get the current date to store in db
+                const currentDate = new Date().toISOString().split('T')[0];
+
+                // Get user's current balance
+                db.query('SELECT balance FROM users WHERE username = ?', [req.session.user], (err, results) => {
+                    if (err) {
+                        console.error('Error getting user balance:', err);
+                        return res.status(500).json({ error: 'Internal Server Error' });
+                    }
+
+                    const currentBalance = parseFloat(results[0].balance);
+
+                    // Add to user's balance
+                    db.query('UPDATE users SET balance = ? WHERE username = ?', [currentBalance + totalPrice, req.session.user], (err, updateResults) => {
+                        if (err) {
+                            console.error('Error updating user balance:', err);
+                            return res.status(500).json({ error: 'Internal Server Error' });
+                        }
+
+                        // Remove stock from user's portfolio with a negative quantity
+                        db.query('INSERT INTO portfolios (user_id, stock_symbol, quantity, price, transaction_type, transaction_date) VALUES (?, ?, ?, ?, ?, ?)',
+                            [req.session.userID, symbol, -quantity, currentPrice, 'sold', currentDate], (error, results) => {
+                                if (error) {
+                                    console.error('Error updating portfolio:', error);
+                                    return res.status(500).json({ error: 'Internal Server Error' });
+                                }
+                                console.log('Stock sold successfully')
+                                res.redirect('/home')
+                            });
+                        }
+                    );
+                });
+            });
+        }
+        else {
+            return res.status(400).json({ message: `User does not own ${quantity} shares of ${symbol}` });
+        }
+    });
+})
+
+app.post('/buy', isAuthenticated,  (req, res) => {
+    // Get parameters
+    const symbol = req.body.stock_symbol
+    const quantity = req.body.quantity
+
+    // Fetch current price of stock
+    finnhubClient.quote(symbol, (err, data, response) => {
+        if (err) {
+            console.error('Error:', err);
+            return res.status(500).json({error: 'Internal Server Error'});
+        }
+
+        const currentPrice = data.c;
+
+        // Check if stock exists
+        if (currentPrice === 0) {
+            return res.status(400).json({message: 'Stock does not exist'});
+        }
+
+        // Total price of users purchase
+        const totalPrice = parseFloat(quantity) * parseFloat(currentPrice);
+
+        // Get the current date to store in db
+        const currentDate = new Date().toISOString().split('T')[0];
+
+        // Get users current balance
+        db.query('SELECT balance FROM users WHERE username = ?', [req.session.user], (err, results) => {
+            if (err) {
+                console.error('Error getting users balance:', err);
+                return res.status(500).json({error: 'Internal Server Error'});
+            }
+            else {
+                const currentBalance = parseFloat(results[0].balance);
+
+                // Check if user can afford to buy
+                if (currentBalance >= totalPrice) {
+
+                    // Subtract from users balance
+                    db.query('UPDATE users SET balance = ? WHERE username = ?', [currentBalance - totalPrice, req.session.user], (err, updateResults) => {
+                        if (err) {
+                            console.error('Error subtracting from users account when buying stock:', err);
+                            return res.status(500).json({error: 'Internal Server Error'});
+                        }
+                        else {
+
+                            // Insert stock into users portfolio
+                            db.query('INSERT INTO portfolios (user_id, stock_symbol, quantity, price, transaction_type, transaction_date) VALUES (?, ?, ?, ?, ?, ?)',
+                                [req.session.userID, symbol, quantity, currentPrice, 'bought', currentDate], (error, results) => {
+                                    if (error) {
+                                        console.error('Error inserting bought stock to users account:', err);
+                                        return res.status(500).json({error: 'Internal Server Error'});
+                                    }
+                                    else {
+                                        console.log('Stock bought successfully')
+                                       res.redirect('/home')
+                                    }
+                                })
+                        }
+                    })
+                }
+                else {
+                    return res.status(500).json({error: 'User cannot afford to buy'});
+                }
+            }
+        });
+    })
+})
+
+app.get('/account', isAuthenticated, (req, res) => {
+    db.query('SELECT balance FROM users WHERE username = ?', [req.session.user], (err, results) => {
+        if (err) {
+            console.error('Error getting users balance:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.render('account', {userBalance: parseFloat(results[0].balance)})
+    })
+})
+
+app.post('/deposit', isAuthenticated, (req, res) => {
+    // Get parameter
+    const addedAmount = parseFloat(req.body.deposit);
+
+    // Get users current balance
+    db.query('SELECT balance FROM users WHERE username = ?', [req.session.user], (err, results) => {
+        if (err) {
+            console.error('Error getting users balance:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        else {
+            const currentBalance = parseFloat(results[0].balance);
+
+            // Update users balance
+            db.query('UPDATE users SET balance = ? WHERE username = ?', [currentBalance + addedAmount, req.session.user], (err, updateResults) => {
+                if (err) {
+                    console.error('Error:', err);
+                    return res.status(500).json({ error: 'Internal Server Error' });
+                }
+                else {
+                    console.log('Deposit successful')
+                    res.redirect('/account')
+                }
+            })
+        }
+    })
+})
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

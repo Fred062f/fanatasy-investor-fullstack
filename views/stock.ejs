@@ -21,6 +21,13 @@
                 <p>Low price of the day: <%= stock.l %></p>
                 <p>Open price of the day: <%= stock.o %></p>
                 <p>Previous close price: <%= stock.pc %></p>
+
+                <form action="/buy" method="post">
+                    <label class="form-label">Number of <%= symbol %> shares to buy</label>
+                    <input type="number" name="quantity" required min="1">
+                    <input type="hidden" name="stock_symbol" value="<%= symbol %>">
+                    <button type="submit" class="btn btn-primary">Buy Stock</button>
+                </form>
             <% } %>
         </div>
     </div>

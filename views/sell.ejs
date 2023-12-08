@@ -1,0 +1,18 @@
+<%- include('layout') %>
+
+<%- include('navbar') %>
+
+<div class="container-fluid">
+    <div class="d-flex flex-column flex-lg-row p-2">
+        <div class="flex-grow-1 w-100">
+            <form action="/sell" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Number of <%= symbol %> shares to sell</label>
+                    <input type="number" class="form-control" name="quantity" required min="1" max="<%= sum %>">
+                    <input type="hidden" name="stock_symbol" value="<%= symbol %>">
+                </div>
+                <button type="submit" class="btn btn-primary">Sell</button>
+            </form>
+        </div>
+    </div>
+</div>

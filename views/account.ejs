@@ -1,0 +1,20 @@
+<%- include('layout') %>
+
+<%- include('navbar') %>
+
+<div class="container-fluid">
+    <div class="d-flex flex-column flex-lg-row p-2">
+        <div class="flex-grow-1 w-100">
+           <p>Current Balance: <%= userBalance %></p>
+        </div>
+        <div class="flex-grow-1 w-100">
+            <form action="/deposit" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Amount to deposit</label>
+                    <input type="number" class="form-control" name="deposit" min="10" max="10000">
+                </div>
+                <button type="submit" class="btn btn-primary">Deposit</button>
+            </form>
+        </div>
+    </div>
+</div>
