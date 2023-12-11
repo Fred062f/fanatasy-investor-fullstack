@@ -10,17 +10,23 @@
     margin-top: 65px;
     padding: 0;
     height: 93vh;
+    /*
     border: 1px solid red;
+
+     */
     justify-content: space-evenly;
 }
 
 .flex-grow-1 {
     padding: 25px;
+    /*
     border: 1px solid black;
+
+     */
 }
 
 #indexBackground {
-    background-image: url("../images/Background2.png");
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)) , url("../images/Background2.png");
 }
 
 h1 {
@@ -29,12 +35,16 @@ h1 {
     font-size: 100px;
 }
 
-.navbar-brand span {
-    color: blue;
+.navbar-brand span{
+    color: lightgrey;
+}
+
+.navbar-brand {
+    font-weight: bold;
 }
 
 h1 span {
-    color: blue;
+    color: lightgrey;
 }
 
 h2 {
