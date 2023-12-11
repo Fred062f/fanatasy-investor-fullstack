@@ -154,7 +154,7 @@ app.get('/logout', function (req, res, next) {
 
 app.get('/home', isAuthenticated, (req, res) => {
     // Query to get user's portfolio
-    db.query('SELECT stock_symbol, SUM(quantity) AS sum FROM portfolios WHERE user_id = ? GROUP BY stock_symbol', [req.session.userID], (error, portfolioResults) => {
+    db.query('SELECT stock_symbol, SUM(quantity) AS sum FROM portfolios WHERE user_id = ? GROUP BY stock_symbol HAVING SUM(quantity) > 0', [req.session.userID], (error, portfolioResults) => {
         if (error) {
             console.error(error);
         }
