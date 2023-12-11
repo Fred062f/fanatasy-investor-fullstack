@@ -25,8 +25,13 @@
      */
 }
 
+button {
+    margin-top: 15px;
+    margin-bottom: 17.5px;
+}
+
 #indexBackground {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)) , url("../images/Background2.png");
+    background-image: url("../images/Background2.png");
 }
 
 h1 {
@@ -36,7 +41,7 @@ h1 {
 }
 
 .navbar-brand span{
-    color: lightgrey;
+    color: blue;
 }
 
 .navbar-brand {
@@ -44,7 +49,7 @@ h1 {
 }
 
 h1 span {
-    color: lightgrey;
+    color: blue;
 }
 
 h2 {
