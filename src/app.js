@@ -174,7 +174,7 @@ app.get('/home', isAuthenticated, (req, res) => {
             console.error(error);
         }
         // Query to get users transactions
-        db.query('SELECT stock_symbol, quantity, price, transaction_type, transaction_date FROM portfolios WHERE user_id = ?', [req.session.userID], (err, transactionsResults) => {
+        db.query('SELECT stock_symbol, quantity, price, transaction_type, DATE_FORMAT(transaction_date,\'%y-%m-%d\') as transaction_date FROM portfolios WHERE user_id = ?', [req.session.userID], (err, transactionsResults) => {
             if (err) {
                 console.error('Error displaying users transactions:', err);
                 return res.status(500).json({ error: 'Internal Server Error' });
