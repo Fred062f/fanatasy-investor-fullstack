@@ -73,22 +73,7 @@ app.get('/stock', (req, res) => {
             return res.status(500).json({ error: 'Internal Server Error' });
         }
 
-        const stockSymbols = [
-            "AAPL", "ABBV", "ABT", "ACN", "ADBE", "ADP", "AGN", "AIG", "AMGN", "AMT",
-            "AMZN", "ANTM", "AXP", "BA", "BAC", "BDX", "BKNG", "BLK", "BMY", "BRK.A",
-            "C", "CAT", "CB", "CI", "CL", "CLX", "CMCSA", "COST", "CRM", "CSCO",
-            "CVS", "CVX", "D", "DE", "DIS", "DHR", "DUK", "ECL", "EL", "F",
-            "FB", "GD", "GE", "GILD", "GM", "GOOGL", "GS", "HD", "HON", "ICE",
-            "INTC", "INTU", "ISRG", "ITW", "JNJ", "JPM", "KMB", "KO", "LIN", "LLY",
-            "LOW", "MA", "MCD", "MDLZ", "MDT", "MMC", "MO", "MRK", "MS", "MSFT",
-            "NEE", "NFLX", "NKE", "NSC", "NVDA", "ORCL", "PEP", "PFE", "PG", "PLD",
-            "PYPL", "QCOM", "RTX", "SBUX", "SCHW", "SLB", "SO", "SPGI", "SYK", "T",
-            "TGT", "TJX", "TMO", "TXN", "UNH", "UNP", "UPS", "USB", "V", "VZ",
-            "WMT", "XOM", "ZTS"
-        ];
-
-        // Return JSON response
-        res.render('stock', {symbol: symbol, stock: data, stockSymbols: stockSymbols});
+        res.render('stock', {symbol: symbol, stock: data});
     });
 })
 

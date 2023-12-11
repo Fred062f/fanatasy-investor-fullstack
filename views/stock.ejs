@@ -8,7 +8,28 @@
             <form action="/stock" method="get">
                 <div class="mb-3">
                     <label for="symbol" class="form-label">Stock Symbol</label>
-                    <input type="text" class="form-control" name="symbol">
+                    <input class="form-control" list="browsers" name="symbol" id="browser">
+                    <%
+                    // Define the list of stocks
+                    let stockSymbols = [
+                        "AAPL", "ABBV", "ABT", "ACN", "ADBE", "ADP", "AGN", "AIG", "AMGN", "AMT",
+                        "AMZN", "ANTM", "AXP", "BA", "BAC", "BDX", "BKNG", "BLK", "BMY", "BRK.A",
+                        "C", "CAT", "CB", "CI", "CL", "CLX", "CMCSA", "COST", "CRM", "CSCO",
+                        "CVS", "CVX", "D", "DE", "DIS", "DHR", "DUK", "ECL", "EL", "F",
+                        "FB", "GD", "GE", "GILD", "GM", "GOOGL", "GS", "HD", "HON", "ICE",
+                        "INTC", "INTU", "ISRG", "ITW", "JNJ", "JPM", "KMB", "KO", "LIN", "LLY",
+                        "LOW", "MA", "MCD", "MDLZ", "MDT", "MMC", "MO", "MRK", "MS", "MSFT",
+                        "NEE", "NFLX", "NKE", "NSC", "NVDA", "ORCL", "PEP", "PFE", "PG", "PLD",
+                        "PYPL", "QCOM", "RTX", "SBUX", "SCHW", "SLB", "SO", "SPGI", "SYK", "T",
+                        "TGT", "TJX", "TMO", "TXN", "UNH", "UNP", "UPS", "USB", "V", "VZ",
+                        "WMT", "XOM", "ZTS"
+                    ];
+                    %>
+                    <datalist id="browsers">
+                        <% stockSymbols.forEach((stock) => { %>
+                        <option value="<%= stock %>">
+                            <% }); %>
+                    </datalist>
                 </div>
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
