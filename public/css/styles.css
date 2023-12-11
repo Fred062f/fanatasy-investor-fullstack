@@ -20,5 +20,23 @@
 }
 
 #indexBackground {
-    background-image: url("../images/background2.png");
+    background-image: url("../images/Background2.png");
+}
+
+h1 {
+    color: black;
+    font-weight: bold;
+    font-size: 100px;
+}
+
+.navbar-brand span {
+    color: blue;
+}
+
+h1 span {
+    color: blue;
+}
+
+h2 {
+    color: black;
 }
