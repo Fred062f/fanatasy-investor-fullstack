@@ -10,19 +10,13 @@
     margin-top: 65px;
     padding: 0;
     height: 93vh;
-    /*
     border: 1px solid red;
-
-     */
     justify-content: space-evenly;
 }
 
 .flex-grow-1 {
     padding: 25px;
-    /*
     border: 1px solid black;
-
-     */
 }
 
 button {
@@ -54,4 +48,8 @@ h1 span {
 
 h2 {
     color: black;
+}
+
+.overflow-auto {
+    height: 375px;
 }

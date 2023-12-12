@@ -164,7 +164,10 @@ app.get('/home', isAuthenticated, (req, res) => {
                 console.error('Error displaying users transactions:', err);
                 return res.status(500).json({ error: 'Internal Server Error' });
             }
-            res.render('home', { portfolio: portfolioResults, transactions: transactionsResults });
+
+            finnhubClient.marketNews("general", {}, (error, data, response) => {
+                res.render('home', { portfolio: portfolioResults, transactions: transactionsResults, news: data});
+            });
         })
     });
 })
@@ -173,7 +176,15 @@ app.get('/sell', isAuthenticated, (req, res) => {
     const stockSymbol = req.query.symbol;
     const stockSum = req.query.sum;
 
-    res.render('sell', { symbol: stockSymbol, sum: stockSum });
+    // Fetch stock information
+    finnhubClient.quote(stockSymbol, (error, data, response) => {
+        if (error) {
+            console.error('Error:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        res.render('sell', { symbol: stockSymbol, sum: stockSum, sellPrice: data.c });
+    })
 })
 
 app.post('/sell', isAuthenticated, (req, res) => {
