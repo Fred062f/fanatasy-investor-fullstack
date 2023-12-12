@@ -10,13 +10,19 @@
     margin-top: 65px;
     padding: 0;
     height: 93vh;
+    /*
     border: 1px solid red;
+
+     */
     justify-content: space-evenly;
 }
 
 .flex-grow-1 {
     padding: 25px;
+    /*
     border: 1px solid black;
+
+     */
 }
 
 button {
@@ -52,4 +58,15 @@ h2 {
 
 .overflow-auto {
     height: 375px;
+}
+
+
+h1 span br {
+    display: none;
+}
+
+@media only screen and (max-width: 767px) {
+    h1 span br {
+        display: initial;
+    }
 }

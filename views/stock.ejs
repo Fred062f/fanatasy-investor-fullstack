@@ -36,12 +36,36 @@
         </div>
         <div class="flex-grow-1 w-100">
             <% if (stock) { %>
-                <p><%= symbol %></p>
-                <p>Current price: <%= stock.c %></p>
-                <p>High price of the day: <%= stock.h %></p>
-                <p>Low price of the day: <%= stock.l %></p>
-                <p>Open price of the day: <%= stock.o %></p>
-                <p>Previous close price: <%= stock.pc %></p>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="text-center"><%= symbol %></th>
+                        <th scope="col">USD</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Current price</th>
+                            <td><%= stock.c %></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">High price of the day</th>
+                            <td><%= stock.h %></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Low price of the day</th>
+                            <td><%= stock.l %></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Open price of the day</th>
+                            <td><%= stock.o %></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Previous close price</th>
+                            <td><%= stock.pc %></td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <form action="/buy" method="post">
                     <label class="form-label">Number of <%= symbol %> shares to buy</label>

@@ -106,7 +106,7 @@ app.post('/login', (req, res) => {
     // Check user credentials
     db.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, results) => {
         if (err) {
-            console.error('Error logging in user:', err);
+            console.error('Error registering user:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
 
