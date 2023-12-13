@@ -19,6 +19,7 @@
 
 .flex-grow-1 {
     padding: 25px;
+    margin-top: 50px;
     /*
     border: 1px solid black;
 
@@ -69,4 +70,11 @@ h1 span br {
     h1 span br {
         display: initial;
     }
+    h2 {
+        font-size: 22.5px;
+    }
+}
+
+label {
+    font-weight: bold;
 }

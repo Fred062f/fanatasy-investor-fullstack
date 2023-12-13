@@ -315,7 +315,8 @@ app.post('/buy', isAuthenticated,  (req, res) => {
                     })
                 }
                 else {
-                    return res.status(500).json({error: 'User cannot afford to buy'});
+                    res.render('error', { error: "You can't afford to buy" })
+                    // return res.status(500).json({error: 'User cannot afford to buy'});
                 }
             }
         });
