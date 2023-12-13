@@ -2,13 +2,13 @@
 
 <%- include('navbar') %>
 
-<div class="container-fluid">
+<div class="container-fluid" id="indexBackground">
     <div class="d-flex flex-column flex-lg-row p-2">
         <div class="flex-grow-1 w-100">
             <h1>Fantasy<span><br>Investor</span></h1>
-            <h2>Dive into the world of fantasy investing with FantasyInvestor. Hone your financial skills, explore diverse investment strategies, and make decisions without the risk of real money. Whether you're a seasoned investor or just starting, join us for a risk-free journey to elevate your investing game.</h2>
+            <h2>Dive into the world of fantasy investing with FantasyInvestor. Hone your financial skills, explore diverse investment strategies, and make decisions without the risk of real money. Whether you're a seasoned investor or just starting, <span>join us</span> for a risk-free journey to elevate your investing game.</h2>
         </div>
-        <div class="flex-grow-1 w-100">
+        <div class="flex-grow-1 w-100 form">
             <form action="/register" method="post">
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
@@ -20,6 +20,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Sign Up</button>
             </form>
+            <a href="/">I already have an account!</a>
         </div>
     </div>
 </div>

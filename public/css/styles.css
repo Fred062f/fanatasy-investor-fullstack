@@ -19,12 +19,23 @@
 
 .flex-grow-1 {
     padding: 25px;
-    margin-top: 50px;
     /*
     border: 1px solid black;
 
      */
 }
+
+.form {
+    margin-top: 275px;
+}
+
+
+@media only screen and (max-width: 1000px) {
+    .form {
+        margin-top: 10px;
+    }
+}
+
 
 button {
     margin-top: 15px;
@@ -32,7 +43,14 @@ button {
 }
 
 #indexBackground {
-    background-image: url("../images/Background2.png");
+    background-image: url("../images/dalle.png");
+}
+
+@media only screen and (min-width: 1260px) {
+    #indexBackground {
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
 }
 
 h1 {
@@ -49,7 +67,7 @@ h1 {
     font-weight: bold;
 }
 
-h1 span {
+span {
     color: blue;
 }
 
