@@ -96,3 +96,7 @@ h1 span br {
 label {
     font-weight: bold;
 }
+
+.headline {
+    color: grey;
+}

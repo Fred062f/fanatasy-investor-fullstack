@@ -26,7 +26,7 @@ app.set('trust proxy', 1) // trust first proxy
 app.use(session({
     secret: 'keyboard cat',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
 }))
 
 // middleware to test if authenticated
@@ -152,25 +152,69 @@ app.get('/logout', function (req, res, next) {
     })
 })
 
-app.get('/home', isAuthenticated, (req, res) => {
-    // Query to get user's portfolio
-    db.query('SELECT stock_symbol, SUM(quantity) AS sum FROM portfolios WHERE user_id = ? GROUP BY stock_symbol HAVING SUM(quantity) > 0', [req.session.userID], (error, portfolioResults) => {
-        if (error) {
-            console.error(error);
-        }
-        // Query to get users transactions
-        db.query('SELECT stock_symbol, quantity, price, transaction_type, DATE_FORMAT(transaction_date,\'%y-%m-%d\') as transaction_date FROM portfolios WHERE user_id = ?', [req.session.userID], (err, transactionsResults) => {
-            if (err) {
-                console.error('Error displaying users transactions:', err);
-                return res.status(500).json({ error: 'Internal Server Error' });
-            }
-
-            finnhubClient.marketNews("general", {}, (error, data, response) => {
-                res.render('home', { portfolio: portfolioResults, transactions: transactionsResults, news: data});
+app.get('/home', isAuthenticated, async (req, res) => {
+    try {
+        // Query to get user's portfolio
+        const portfolioResults = await new Promise((resolve, reject) => {
+            db.query('SELECT stock_symbol, SUM(quantity) AS sum FROM portfolios WHERE user_id = ? GROUP BY stock_symbol HAVING SUM(quantity) > 0 ORDER BY stock_symbol', [req.session.userID], (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(results);
+                }
             });
-        })
-    });
-})
+        });
+
+        // Fetch current prices for each stock in users portfolio
+        const array = await Promise.all(portfolioResults.map(async (stock) => {
+            try {
+                const quoteData = await new Promise((resolve, reject) => {
+                    finnhubClient.quote(stock.stock_symbol, (error, data, response) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(data.c);
+                        }
+                    });
+                });
+                return quoteData;
+            } catch (error) {
+                console.error('Error fetching stock quote:', error);
+                return null;
+            }
+        }));
+
+        // Query to get users transactions
+        const transactionsResults = await new Promise((resolve, reject) => {
+            db.query('SELECT stock_symbol, quantity, price, transaction_type, DATE_FORMAT(transaction_date,\'%y-%m-%d\') as transaction_date FROM portfolios WHERE user_id = ?', [req.session.userID], (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
+
+        // Fetch market news
+        const marketNews = await new Promise((resolve, reject) => {
+            finnhubClient.marketNews("general", {}, (error, data, response) => {
+                if (error) {
+                    console.error('Error fetching market news:', error);
+                    reject(error);
+                } else {
+                    resolve(data);
+                }
+            });
+        });
+
+        res.render('home', { portfolio: portfolioResults, transactions: transactionsResults, news: marketNews, array: array });
+    }
+    catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 app.get('/sell', isAuthenticated, (req, res) => {
     const stockSymbol = req.query.symbol;
