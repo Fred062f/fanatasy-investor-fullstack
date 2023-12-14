@@ -154,7 +154,7 @@ app.get('/logout', function (req, res, next) {
 
 app.get('/home', isAuthenticated, async (req, res) => {
     try {
-        // Query to get user's portfolio
+        // Query to get users portfolio
         const portfolioResults = await new Promise((resolve, reject) => {
             db.query('SELECT stock_symbol, SUM(quantity) AS sum FROM portfolios WHERE user_id = ? GROUP BY stock_symbol HAVING SUM(quantity) > 0 ORDER BY stock_symbol', [req.session.userID], (error, results) => {
                 if (error) {
