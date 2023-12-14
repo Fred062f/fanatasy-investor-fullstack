@@ -100,3 +100,8 @@ label {
 .headline {
     color: grey;
 }
+
+.logout {
+    position: fixed;
+    bottom: 10%;
+}
