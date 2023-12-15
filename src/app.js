@@ -106,7 +106,7 @@ app.post('/login', (req, res) => {
     // Check user credentials
     db.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, results) => {
         if (err) {
-            console.error('Error registering user:', err);
+            console.error('Error logging in user:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
 
@@ -128,6 +128,9 @@ app.post('/login', (req, res) => {
                     res.redirect('/home')
                 })
             })
+        }
+        else {
+            res.render('error', {error: "Wrong credentials"})
         }
     })
 })
