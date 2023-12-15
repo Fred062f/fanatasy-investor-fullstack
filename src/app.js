@@ -91,7 +91,8 @@ app.post('/register', (req, res) => {
     db.query('INSERT INTO users (username, password, balance) VALUES (?, ?, ?)', [username, password, 10000], (err, results) => {
         if (err) {
             console.error('Error registering user:', err);
-            return res.status(500).json({ error: 'Internal Server Error' });
+            return res.render('error', {error: "Username taken"})
+            //return res.status(500).json({ error: 'Internal Server Error' });
         }
         console.log('User registered successfully')
         res.render('index')
